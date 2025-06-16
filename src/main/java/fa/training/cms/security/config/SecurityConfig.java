@@ -20,6 +20,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationFilter authenticationFilter) throws Exception {
         return http
                 .csrf(CsrfConfigurer::disable)
+                .headers(header -> header.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("error").permitAll()
                         .requestMatchers("/api/auth/login").permitAll()
