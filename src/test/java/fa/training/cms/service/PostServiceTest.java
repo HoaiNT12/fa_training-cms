@@ -8,6 +8,7 @@ import fa.training.cms.service.dto.PostDto;
 import fa.training.cms.service.enums.Role;
 import fa.training.cms.service.enums.Status;
 import fa.training.cms.service.impl.PostServiceImpl;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -48,6 +50,7 @@ class PostServiceTest {
     private List<PostCategory> postCategories;
     private Post post;
     private PostDto postDto;
+    private List<Category> categorys;
 
     public static Stream<Arguments> getPostByIdArguments(){
         User user = new User(1L,"Hoai","adsds", Role.EDITOR,true,null,null);
@@ -89,6 +92,10 @@ class PostServiceTest {
 		post.setPostCategories(postCategories);
 		category1.setPostCategories(postCategories);
 		category2.setPostCategories(postCategories);
+
+        categorys = new ArrayList<>();
+        categorys.add(category1);
+        categorys.add(category2);
         //dto
         categoryIds = new ArrayList<>();
         categoryIds.add(new CategoryDto(1L,"Category 1"));
@@ -131,26 +138,71 @@ class PostServiceTest {
 
     @Test
     void create() {
-//        doAnswer( inv ->
-//                {
-//					Post src = inv.getArgument(0);
-//                    PostDto dest = inv.getArgument(1);
-//                    dest.setId(src.getId());
-//                    dest.setTitle(src.getTitle());
-//                    src.getPostCategories().stream()
-//                            .map()
-//                }
-//        ).when(modelMapper).map(any(Post.class), any(PostDto.class));
+        doAnswer( inv ->
+                {
+                    PostDto src = inv.getArgument(0);
+                    Post dest = inv.getArgument(1);
+                    dest.setId(src.getId());
+                    dest.setTitle(src.getTitle());
+                    dest.setPostCategories(src.getCategoryIds().stream()
+                            .map(pc -> {
+                                var pc1 = postCategories.stream().filter(p -> p.getId().getCategory_id() == pc.getId()).findFirst();
+                                return pc1.get();
+                            })
+                            .collect(Collectors.toList()));
+                    return null;
+                }
+        ).when(modelMapper).map(any(PostDto.class), any(Post.class));
+        when(categoryRepository.findAllById(any())).thenReturn(categorys);
+        when(postRepository.save(any())).thenReturn(post);
+        when(modelMapper.map(post,PostDto.class)).thenReturn(postDto);
+
+        var insertedPost = postService.create(postDto, user);
+
+        assertNotNull(insertedPost);
+        assertEquals(postDto.getId(),insertedPost.getId());
+        assertEquals(postDto.getTitle(),insertedPost.getTitle());
+        assertEquals(2, insertedPost.getCategoryIds().size());
+
+        verify(postRepository, times(1)).save(any());
+        verify(categoryRepository, times(1)).findAllById(any());
     }
 
     @Test
     void update_HappyCase() {
         // AAA pattern
         //Arrange set up data, dependencies, mocks
-		Post afterPost = new Post(1L, "Test", "Test", Status.PUBLISHED,null,null);
+        CategoryDto updatedCategoryDto = new CategoryDto(1L,"Category 1");
+        Category updatedCategory = new Category(1L, "Category 1", true, null);
+        PostDto updatedPostDto = PostDto.builder()
+                .id(1L)
+                .title("Updated tile")
+                .content("Updated content")
+                .categoryIds(List.of(updatedCategoryDto))
+                .build();
+        Post updatedPost = new Post(1L, "Updated tile", "Updated content", Status.PUBLISHED, null, user);
+        PostCategory updatedPostCategory = new PostCategory(new PostCategoryEmbededId(1L,1L),updatedCategory,updatedPost);
+		updatedCategory.setPostCategories(Arrays.asList(updatedPostCategory));
+        updatedPost.setPostCategories(Arrays.asList(updatedPostCategory));
+
         //stubbing dependencies (assume dependencies are well-behavior)
+        doAnswer(inv ->{
+            PostDto src = inv.getArgument(0);
+            Post dest = inv.getArgument(1);
+            dest.setId(src.getId());
+            dest.setUser(user);
+            dest.setTitle(src.getTitle());
+            dest.setContent(src.getContent());
+            dest.setPostCategories(Arrays.asList(updatedPostCategory));
+            dest.setStatus(src.getStatus());
+            return null;
+        }).when(modelMapper).map(any(PostDto.class), any(Post.class));
+
+
         when(postRepository.findById(1L)).thenReturn(Optional.of(post));
-        //Mockito.when(categoryRepository.)
+        when(categoryRepository.findAllById(any())).thenReturn(Arrays.asList(updatedCategory));
+        when(postRepository.save(any(Post.class))).thenReturn(updatedPost);
+        when(modelMapper.map(updatedPost, PostDto.class)).thenReturn(updatedPostDto);
 
         //Act: execute the method under test
         PostDto updatedDto = postService.update(postDto);
@@ -158,19 +210,36 @@ class PostServiceTest {
         //Check behavior + interaction with dependencies
         assertNotNull(updatedDto);
         assertEquals(postDto.getTitle(), updatedDto.getTitle());
+        assertEquals(1, updatedDto.getCategoryIds().size());
         //check interaction of dependencies
         verify(postRepository,Mockito.times(1)).findById(1L);
-
-
-
+		verify(categoryRepository,times(1)).findAllById(any());
+        verify(postRepository, times(1)).save(post);
+        verify(modelMapper, times(1)).map(updatedDto, PostDto.class);
     }
 
     @Test
     void update_PostNotFound(){
+		when(postRepository.findById(any())).thenReturn(Optional.empty());
 
+        //var result = postService.update(postDto);
+
+        assertThrows(EntityNotFoundException.class, () -> postService.update(postDto));
+
+        verify(postRepository,Mockito.times(1)).findById(1L);
+        verify(categoryRepository,times(0)).findAllById(any());
+        verify(postRepository, times(0)).save(post);
+        verify(modelMapper, times(0)).map(any(Post.class), any(PostDto.class));
     }
 
     @Test
     void softDelete() {
+        when(postRepository.findById(1L)).thenReturn(Optional.of(post));
+
+        postService.softDelete(1L);
+
+        assertTrue(post.isDeleted());
+        verify(postRepository, times(1)).findById(1L);
+        verify(postRepository, times(1)).save(post);
     }
 }
