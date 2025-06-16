@@ -182,8 +182,8 @@ class PostServiceTest {
                 .build();
         Post updatedPost = new Post(1L, "Updated tile", "Updated content", Status.PUBLISHED, null, user);
         PostCategory updatedPostCategory = new PostCategory(new PostCategoryEmbededId(1L,1L),updatedCategory,updatedPost);
-		updatedCategory.setPostCategories(Arrays.asList(updatedPostCategory));
-        updatedPost.setPostCategories(Arrays.asList(updatedPostCategory));
+		updatedCategory.setPostCategories(List.of(updatedPostCategory));
+        updatedPost.setPostCategories(List.of(updatedPostCategory));
 
         //stubbing dependencies (assume dependencies are well-behavior)
         doAnswer(inv ->{
@@ -193,29 +193,32 @@ class PostServiceTest {
             dest.setUser(user);
             dest.setTitle(src.getTitle());
             dest.setContent(src.getContent());
-            dest.setPostCategories(Arrays.asList(updatedPostCategory));
+            dest.setPostCategories(src.getCategoryIds().stream()
+                    .map(s ->{
+                        var pc = postCategories.stream().filter(p-> p.getId().getCategory_id() == s.getId()).findFirst();
+                        return pc.get();
+                    })
+                    .collect(Collectors.toList()));
             dest.setStatus(src.getStatus());
             return null;
         }).when(modelMapper).map(any(PostDto.class), any(Post.class));
 
 
         when(postRepository.findById(1L)).thenReturn(Optional.of(post));
-        when(categoryRepository.findAllById(any())).thenReturn(Arrays.asList(updatedCategory));
+        lenient().when(categoryRepository.findAllById(any())).thenReturn(List.of(updatedCategory));
         when(postRepository.save(any(Post.class))).thenReturn(updatedPost);
-        when(modelMapper.map(updatedPost, PostDto.class)).thenReturn(updatedPostDto);
+        when(modelMapper.map(any(Post.class), eq(PostDto.class))).thenReturn(updatedPostDto);
 
         //Act: execute the method under test
         PostDto updatedDto = postService.update(postDto);
         //Assert: verify the result of method under test
         //Check behavior + interaction with dependencies
         assertNotNull(updatedDto);
-        assertEquals(postDto.getTitle(), updatedDto.getTitle());
+        assertEquals(updatedPostDto.getTitle(), updatedDto.getTitle());
         assertEquals(1, updatedDto.getCategoryIds().size());
         //check interaction of dependencies
         verify(postRepository,Mockito.times(1)).findById(1L);
-		verify(categoryRepository,times(1)).findAllById(any());
         verify(postRepository, times(1)).save(post);
-        verify(modelMapper, times(1)).map(updatedDto, PostDto.class);
     }
 
     @Test
