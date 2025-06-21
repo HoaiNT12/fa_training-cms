@@ -2,6 +2,7 @@ package fa.training.cms.service;
 
 import fa.training.cms.entity.*;
 import fa.training.cms.repository.CategoryRepository;
+import fa.training.cms.repository.PostCategoryRepository;
 import fa.training.cms.repository.PostRepository;
 import fa.training.cms.service.dto.CategoryDto;
 import fa.training.cms.service.dto.PostDto;
@@ -39,6 +40,8 @@ class PostServiceTest {
     private PostRepository postRepository;// = Mockito.mock(PostRepository.class);
     @Mock
     private CategoryRepository categoryRepository;
+    @Mock
+    private PostCategoryRepository postCategoryRepository;
     @Mock
     private ModelMapper modelMapper;
 
@@ -238,7 +241,7 @@ class PostServiceTest {
     @Test
     void softDelete() {
         when(postRepository.findById(1L)).thenReturn(Optional.of(post));
-
+        when(postCategoryRepository.findByPostId(1L)).thenReturn(List.of());
         postService.softDelete(1L);
 
         assertTrue(post.isDeleted());

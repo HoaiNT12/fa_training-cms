@@ -20,12 +20,14 @@ import java.util.stream.Collectors;
 public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
     private final CategoryRepository categoryRepository;
+    private final PostCategoryRepository postCategoryRepository;
     private final ModelMapper modelMapper;
 
     @Autowired
-    public PostServiceImpl(PostRepository postRepository, CategoryRepository categoryRepository, ModelMapper modelMapper) {
+    public PostServiceImpl(PostRepository postRepository, CategoryRepository categoryRepository, PostCategoryRepository postCategoryRepository, ModelMapper modelMapper) {
         this.postRepository = postRepository;
         this.categoryRepository = categoryRepository;
+        this.postCategoryRepository = postCategoryRepository;
         this.modelMapper = modelMapper;
     }
 
@@ -155,6 +157,9 @@ public class PostServiceImpl implements PostService {
         if(post.isPresent()){
             Post existingPost = post.get();
             existingPost.setDeleted(true);
+            List<PostCategory> postCategories = postCategoryRepository.findByPostId(existingPost.getId());
+            postCategories.forEach(s -> s.setDeleted(true));
+            postCategoryRepository.saveAll(postCategories);
             postRepository.save(existingPost);
         }
         else {
