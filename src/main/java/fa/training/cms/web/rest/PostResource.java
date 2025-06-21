@@ -38,9 +38,9 @@ public class PostResource {
     public ResponseEntity<PostDto> postDetail(@PathVariable Long id){
         Optional<PostDto> post = postService.postDetail(id);
         if(post.isPresent()){
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.ok(post.get());
         }
-        return ResponseEntity.ok(post.get());
+        return ResponseEntity.notFound().build();
     }
 
     @PostMapping

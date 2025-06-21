@@ -2,6 +2,7 @@ package fa.training.cms.service;
 
 import fa.training.cms.entity.Category;
 import fa.training.cms.repository.CategoryRepository;
+import fa.training.cms.repository.PostCategoryRepository;
 import fa.training.cms.service.impl.CategoryServiceImpl;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,6 +24,8 @@ class CategoryServiceTest {
 
     @Mock
     private CategoryRepository categoryRepository;
+    @Mock
+    private PostCategoryRepository postCategoryRepository;
 
     @InjectMocks
     private CategoryServiceImpl categoryServiceImpl;
@@ -122,7 +125,7 @@ class CategoryServiceTest {
     void inactivate_ShouldInactivateCategoryWhenIdExists() {
         // Arrange
         when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
-
+		when(postCategoryRepository.findByCategoryId(1L)).thenReturn(List.of());
         // Act
         categoryServiceImpl.inactivate(1L);
 

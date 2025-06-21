@@ -13,7 +13,8 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
+    defer-datasource-initialization: true
   h2:
     console:
       enabled: true
@@ -21,5 +22,10 @@ spring:
       setting:
         trace: false
         web-allow-others: true
+  sql:
+    init:
+      mode: always
+  main:
+    allow-bean-definition-overriding: true
 server:
   port: 8080

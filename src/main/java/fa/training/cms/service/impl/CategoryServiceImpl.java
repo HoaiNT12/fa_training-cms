@@ -1,9 +1,12 @@
 package fa.training.cms.service.impl;
 
 import fa.training.cms.entity.Category;
+import fa.training.cms.entity.PostCategory;
 import fa.training.cms.repository.CategoryRepository;
+import fa.training.cms.repository.PostCategoryRepository;
 import fa.training.cms.service.CategoryService;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,10 +16,12 @@ import java.util.Optional;
 @Service
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
+    private final PostCategoryRepository postCategoryRepository;
 
     @Autowired
-    public CategoryServiceImpl(CategoryRepository categoryRepository) {
+    public CategoryServiceImpl(CategoryRepository categoryRepository, PostCategoryRepository postCategoryRepository) {
         this.categoryRepository = categoryRepository;
+        this.postCategoryRepository = postCategoryRepository;
     }
 
     @Override
@@ -45,12 +50,16 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional
     public void inactivate(Long id) throws EntityNotFoundException{
         Optional<Category> category = categoryRepository.findById(id);
         if(category.isPresent()){
             Category existingCategory = category.get();
             existingCategory.setActive(false);
+            List<PostCategory> postCategories = postCategoryRepository.findByCategoryId(existingCategory.getId());
+            postCategories.forEach(s -> s.setDeleted(true));
             categoryRepository.save(existingCategory);
+            postCategoryRepository.saveAll(postCategories);
         }
         else {
             throw new EntityNotFoundException("Category not found with id " + id);
