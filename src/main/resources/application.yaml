@@ -27,5 +27,11 @@ spring:
       mode: always
   main:
     allow-bean-definition-overriding: true
+  batch:
+    job:
+      enable: false
+job:
+  postDel:
+    folderPath: /Users/X1/Documents/java/cms/data
 server:
   port: 8080

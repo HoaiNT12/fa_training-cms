@@ -2,10 +2,7 @@ package fa.training.cms.entity;
 
 import fa.training.cms.service.enums.Role;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.Where;
 
 import java.util.List;
@@ -15,6 +12,7 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Table(name = "app_user")
 @Where(clause = "is_deleted = FALSE AND is_active = TRUE")
 public class User extends Auditable{
