@@ -9,48 +9,6 @@
 			"name": "auth",
 			"item": [
 				{
-					"name": "seed users",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IkU2Y05SeWNUNFZ3NVhIck5SeU5MWCJ9.eyJpc3MiOiJodHRwczovL2Rldi1odm9wcXdndXE4aXpwN2E1LnVzLmF1dGgwLmNvbS8iLCJhdWQiOiJzdzlDWkFIZDN1UjhHS0ZZYk40eUVpejBGblpXZWRsMyIsImlhdCI6MTcwMTA1Njg1MiwiZXhwIjoxNzAxMDkyODUyLCJzdWIiOiJhdXRoMHw2NTY0MDk0YTAyMmE5ZmMzYmVhMzVmYTkiLCJhdF9oYXNoIjoiUi11X1FGNGhyUlZTVG54S1FDUjFtZyIsInNpZCI6InVfUVQwZlFhVk11X19QSTI0Q2k2ZzhTUmZSUGlHNkpzIiwibm9uY2UiOiJGYk5SX3I4T0s1QTZkVGJIWnR5RURyMFZCcmJWTVJWMiJ9.rv_EaZjTiUmCa6E6OFQNMx-qFyVRRFrLel6ipXs5ZdNv6NFPmgVwLknDxKxdVBtTyYVSfUKqEVae_x1sxDuNnVe-_oNfpAhPAS4e9BVJJBWTfVAiIFpjTYGSq_H1xWg4QbC2OO_sRmKbsFPWSaryCD2U7ZXYZAMf6dVCBte-ITt01aT9a8CmgH1YMb83EWnaozIrx_NPv5PaCxokJJlFnz1SQZF2uvhQ3Czun91sdx_QczNnFjHkwTOggb4ukcbOtbUVLDcmJUAnvQHUctrCgSNl_0WliKp1eR_kLqLdOF3wOQQIFVeGBPcfjsdLyM0DS2klXEMpHQmP0qBt-cNiBw",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "localhost:8080/api/auth/seed",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"api",
-								"auth",
-								"seed"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "login as admin",
 					"event": [
 						{
@@ -140,6 +98,17 @@
 								"auth",
 								"login"
 							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "seed",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": ""
 						}
 					},
 					"response": []
