@@ -1,4 +1,5 @@
 package fa.training.cms.job;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -13,6 +14,7 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -23,18 +25,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
+
 @Component
 @StepScope
 public class GenerateMockPostDataTasklet implements Tasklet {
     private static final int NUMBER_OF_RECORDS = 1000;
     private static final String FILE_NAME = "mock_posts.json"; // Tên file output
     private final String folderPath; // Được inject từ JobParameters
+
     // Constructor để inject folderPath
     public GenerateMockPostDataTasklet(
             @Value("${job.postDel.folderPath}") String folderPath
     ) {
         this.folderPath = folderPath;
     }
+
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
         if (folderPath == null || folderPath.isBlank()) {
@@ -58,14 +63,13 @@ public class GenerateMockPostDataTasklet implements Tasklet {
             LocalDateTime createdDate = faker.date().past(365, TimeUnit.DAYS).toInstant().atOffset(ZoneOffset.UTC).toLocalDateTime();
             LocalDateTime lastModifiedDate = createdDate.plusDays(random.nextInt(30));
             Long authorId = (long) (random.nextInt(5) + 1); // Giả sử có 5 user
-            Post post = new Post(
-                    (long) i,
-                    faker.book().title(),
-                    faker.lorem().paragraph(5),
-                    statuses[random.nextInt(statuses.length)],
-                    null,
-                    User.builder().id(authorId).build()
-            );
+            Post post = Post.builder()
+                    .title(faker.book().title())
+                    .content(faker.lorem().paragraph(5))
+                    .status(statuses[random.nextInt(statuses.length)])
+                    .user(User.builder().id(authorId).build())
+
+                    .build();
             posts.add(post);
         }
         try {

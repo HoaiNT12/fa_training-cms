@@ -14,7 +14,7 @@ VALUES
 ('bob', '$2a$10$i3u/GWZLWI7TvMx589tK0.G2o0kQrZDq7A4vGiXK6KJa4Xp2ZAYCC', 'EDITOR', true, false, 'system', CURRENT_TIMESTAMP, 'system', CURRENT_TIMESTAMP),
 ('carol', '$2a$10$16Cbhe3DY/8t5CYIIw5qj.NtInqHlisFxwEKMpAVwjRcDoqdf4ae6', 'ADMIN', true, false, 'system', CURRENT_TIMESTAMP, 'system', CURRENT_TIMESTAMP),
 ('dave', '$2a$10$OMwYvPQdAvjQnFbMjTQc2.81sYCdHhRjWNqTpaAlfKlMI5yRdI23y', 'EDITOR', true, false, 'system', CURRENT_TIMESTAMP, 'system', CURRENT_TIMESTAMP),
-('eve', '$2a$10$9g/17pdHWXiG5EokU88xvuS9b2Yzjc9GlECywRbhR5QPOXEQSORie', 'ADMIN', false, true, 'system', CURRENT_TIMESTAMP, 'system', CURRENT_TIMESTAMP);
+('eve', '$2a$10$9g/17pdHWXiG5EokU88xvuS9b2Yzjc9GlECywRbhR5QPOXEQSORie', 'ADMIN', true, false, 'system', CURRENT_TIMESTAMP, 'system', CURRENT_TIMESTAMP);
 
 
 INSERT INTO profile (id, full_name, address, phone_number, email, is_deleted, created_by, created_date, last_modified_by, last_modify_date)
