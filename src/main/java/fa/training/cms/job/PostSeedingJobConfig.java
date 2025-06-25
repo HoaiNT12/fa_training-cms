@@ -51,15 +51,18 @@ public class PostSeedingJobConfig {
     @Autowired
     private final PostJsonReader postJsonReader;
     @Autowired
+    private final PostContentLengthFilter postContentLengthFilter;
+    @Autowired
     private final RemoveMockDataFileTasklet removeMockDataFileTasklet;
     @Autowired
     private final WriteReportTasklet writeReportTasklet;
+
     public PostSeedingJobConfig(
             JobRepository jobRepository,
             PlatformTransactionManager transactionManager,
             JobFolderCreatorTasklet createFolderTasklet,
             GenerateMockPostDataTasklet generateMockDataTasklet,
-            PostJsonReader postJsonReader,
+            PostJsonReader postJsonReader, PostContentLengthFilter postContentLengthFilter,
             RemoveMockDataFileTasklet removeMockDataFileTasklet,
             WriteReportTasklet writeReportTasklet
     ) {
@@ -68,6 +71,7 @@ public class PostSeedingJobConfig {
         this.createFolderTasklet = createFolderTasklet;
         this.generateMockDataTasklet = generateMockDataTasklet;
         this.postJsonReader = postJsonReader;
+        this.postContentLengthFilter = postContentLengthFilter;
         this.removeMockDataFileTasklet = removeMockDataFileTasklet;
         this.writeReportTasklet = writeReportTasklet;
     }
@@ -91,6 +95,7 @@ public class PostSeedingJobConfig {
         return new StepBuilder("dataImportStep", jobRepository)
                 .<Post, Post>chunk(50, transactionManager)
                 .reader(postJsonReader)
+                .processor(postContentLengthFilter)
                 .writer(postDatabaseWriter)
                 .build();
     }
