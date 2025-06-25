@@ -19,21 +19,17 @@ import java.time.Instant;
 @Setter
 @EntityListeners(AuditingEntityListener.class)
 public class Auditable {
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(updatable = false)
     @CreatedBy
     private String createdBy;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(updatable = false)
     @CreatedDate
     private Instant createdDate;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @LastModifiedBy
     private String lastModifiedBy;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @LastModifiedDate
     private Instant lastModifyDate;
 

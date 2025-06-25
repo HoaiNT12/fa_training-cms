@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -60,16 +61,19 @@ public class GenerateMockPostDataTasklet implements Tasklet {
         List<Post> posts = new ArrayList<>();
         Status[] statuses = Status.values();
         for (int i = 1; i <= NUMBER_OF_RECORDS; i++) {
-            LocalDateTime createdDate = faker.date().past(365, TimeUnit.DAYS).toInstant().atOffset(ZoneOffset.UTC).toLocalDateTime();
-            LocalDateTime lastModifiedDate = createdDate.plusDays(random.nextInt(30));
+            Instant createdDate = faker.date().past(365, TimeUnit.DAYS).toInstant().atOffset(ZoneOffset.UTC).toInstant();
+            Instant lastModifiedDate = createdDate.plusMillis(random.nextInt(30));
             Long authorId = (long) (random.nextInt(5) + 1); // Giả sử có 5 user
-            Post post = Post.builder()
-                    .title(faker.book().title())
-                    .content(faker.lorem().paragraph(5))
-                    .status(statuses[random.nextInt(statuses.length)])
-                    .user(User.builder().id(authorId).build())
-
-                    .build();
+            Post post = new Post(
+                    faker.book().title(),
+                    faker.lorem().paragraph(5),
+                    statuses[random.nextInt(statuses.length)],
+                    User.builder().id(authorId).build(),
+                    faker.name().username(),
+                    createdDate,
+                    faker.name().username(),
+                    lastModifiedDate
+            );
             posts.add(post);
         }
         try {

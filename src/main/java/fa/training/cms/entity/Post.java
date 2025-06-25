@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Where;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,11 +32,33 @@ public class Post extends Auditable{
     private Status status = Status.PUBLISHED;
 
     @OneToMany(mappedBy = "post",cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PostCategory> postCategories;
+    private List<PostCategory> postCategories = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "author_id")
     private User user;
+
+
+    public Post(
+                String title,
+                String content,
+                Status status,
+                User user,
+                String createdBy,
+                Instant createdDate,
+                String lastModifiedBy,
+                Instant lastModifiedDate
+                ) {
+
+        this.title = title;
+        this.content = content;
+        this.status = status;
+        this.user = user;
+        this.setCreatedBy(createdBy);
+        this.setCreatedDate(createdDate);
+        this.setLastModifiedBy(lastModifiedBy);
+        this.setLastModifyDate(lastModifiedDate);
+    }
 
     @Override
     public String toString() {
