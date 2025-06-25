@@ -10,8 +10,8 @@ public class PostContentLengthFilter implements ItemProcessor<Post, Post> {
     @Override
     public Post process(Post post) throws Exception {
         if (post.getContent() != null && post.getContent().length() <= MAX_CONTENT_LENGTH) {
-            return post; // Giữ lại Post nếu content <= 500 ký tự
+            return post;
         }
-        return null; // Bỏ qua Post nếu content dài hơn 500 ký tự
+        return null;
     }
 }
