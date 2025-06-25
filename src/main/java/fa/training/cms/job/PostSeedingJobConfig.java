@@ -102,7 +102,7 @@ public class PostSeedingJobConfig {
     // Step 4: Remove the mock data file after processing
     @Bean("fileRemovalStep")
     public Step fileRemovalStep() {
-        return new StepBuilder("fileRemovalStep", jobRepository)
+    return new StepBuilder("fileRemovalStep", jobRepository)
                 .tasklet(removeMockDataFileTasklet, transactionManager)
                 .build();
     }
